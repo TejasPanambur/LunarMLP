@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejas Panambur - Lunar Surface Analysis with Multimodal ML | CVPR 2025</title>
+    <meta name="description" content="A Foundational Multimodal Model for Lunar Surface Correlation Discovery: Uncovering Hydration and Beyond - CVPR 2025">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Orbitron:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <style>
+        :root {
+            --deep-space-start: #01010c;
+            --deep-space-end: #0d0d21;
+            --nebula-purple: #4c1d95;
+            --nebula-blue: #2563eb;
+            --star-glow: #e0e7ff;
+            --accent-glow: #a78bfa;
+            --text-primary-dark: #f8fafc;
+            --text-secondary-dark: #cbd5e1;
+            --text-primary-light: #1f2937;
+            --text-secondary-light: #6b7280;
+            --bg-light: #ffffff;
+            --bg-light-secondary: #f8fafc;
+            --border-color: rgba(224, 231, 255, 0.2);
+
+            --gradient-nebula: linear-gradient(
+                135deg, 
+                var(--nebula-purple) 0%, 
+                var(--nebula-blue) 100%
+            );
+            
+            --gradient-accent: linear-gradient(
+                45deg,
+                var(--accent-glow) 0%,
+                #c4b5fd 100%
+            );
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary-dark);
+            overflow-x: hidden;
+            background: var(--deep-space-end);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        section {
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(1, 1, 12, 0.8);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--star-glow);
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            color: var(--accent-glow);
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary-dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--star-glow);
+            text-shadow: 0 0 5px rgba(224, 231, 255, 0.3);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--gradient-accent);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+        
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--star-glow);
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        /* Hero Section */
+        @keyframes move-background {
+            from {
+                background-position: 0 0, 0 0;
+            }
+            to {
+                background-position: -10000px 5000px, 0 0;
+            }
+        }
+
+        .hero {
+            background-color: var(--deep-space-start);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(25,29,58,0.9)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23g)"/></svg>'),
+                              radial-gradient(circle at 20% 25%, var(--nebula-purple) 0%, transparent 40%),
+                              radial-gradient(circle at 80% 75%, var(--nebula-blue) 0%, transparent 40%);
+            color: white;
+            padding: 8rem 0 6rem;
+            text-align: center;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            animation: move-background 200s linear infinite;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, var(--star-glow), transparent),
+                radial-gradient(1px 1px at 80px 120px, var(--star-glow), transparent),
+                radial-gradient(2px 2px at 150px 80px, var(--star-glow), transparent);
+            background-repeat: repeat;
+            background-size: 200px 150px;
+            animation: twinkle 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.1; }
+            100% { opacity: 0.5; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(45deg, var(--star-glow) 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(167, 139, 250, 0.4);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary-dark);
+            font-weight: 300;
+            margin-right: auto;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary-dark);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conference-badge {
+            display: inline-block;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            font-family: 'Orbitron', monospace;
+            color: var(--accent-glow);
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .conference-badge:hover {
+            background: rgba(167, 139, 250, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Authors Section */
+        .authors-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .authors-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .author-card {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .author-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--text-secondary-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .author-name a {
+            color: var(--accent-glow);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .author-name a:hover {
+            text-shadow: 0 0 5px rgba(167, 139, 250, 0.5);
+            color: var(--star-glow);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: var(--deep-space-end);
+            border: 2px solid transparent;
+            box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Research Overview */
+        .research-overview {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--bg-light-secondary) 0%, #e2e8f0 100%);
+            position: relative;
+        }
+
+        .research-overview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="crater" patternUnits="userSpaceOnUse" width="10" height="10"><circle cx="5" cy="5" r="1" fill="%23f1f5f9" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23crater)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary-dark);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .research-card {
+            background: rgba(13, 13, 33, 0.5);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .research-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .research-card:hover::before {
+            opacity: 1;
+        }
+        
+        .research-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: rgba(13, 13, 33, 0.8);
+        }
+
+        .research-card h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-glow);
+        }
+        
+        .research-card p {
+            color: var(--text-secondary-dark);
+        }
+
+        .methodology-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin: 3rem 0;
+            position: relative;
+            z-index: 2;
+            border: 1px solid var(--border-color);
+        }
+
+        .methodology-text h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--star-glow);
+        }
+
+        .methodology-text h4 {
+            font-family: 'Orbitron', monospace;
+            color: var(--accent-glow);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .methodology-text strong {
+            color: var(--accent-glow);
+            font-weight: 500;
+        }
+
+        .methodology-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .methodology-steps li {
+            counter-increment: step-counter;
+            margin-bottom: 1.5rem;
+            padding-left: 3rem;
+            position: relative;
+        }
+
+        .methodology-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--gradient-accent);
+            color: var(--deep-space-end);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .code-block {
+            background: rgba(1, 1, 12, 0.8);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Results Section */
+        .results {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            z-index: 2;
+        }
+
+        .result-card {
+            background: rgba(13, 13, 33, 0.5);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover::before {
+            opacity: 1;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: rgba(13, 13, 33, 0.8);
+        }
+
+        .result-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--star-glow);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-description {
+            color: var(--text-secondary-dark);
+            font-size: 0.9rem;
+        }
+
+        /* Publications */
+        .publications {
+            padding: 6rem 0;
+            background: var(--gradient-accent);
+            color: white;
+            position: relative;
+        }
+
+        .publications::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 20px 20px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 80px 80px, rgba(255,255,255,0.15), transparent);
+            background-size: 100px 100px;
+            opacity: 0.3;
+        }
+
+        .publication-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .publication-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: rgba(167, 139, 250, 0.5);
+        }
+
+        .publication-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-glow);
+        }
+
+        .publication-authors {
+            color: var(--text-secondary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .publication-venue {
+            color: var(--star-glow);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--deep-space-start);
+            color: white;
+            padding: 4rem 0 2rem;
+            text-align: center;
+            position: relative;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 30px 40px, var(--star-glow), transparent),
+                radial-gradient(1px 1px at 70px 20px, var(--star-glow), transparent),
+                radial-gradient(1px 1px at 120px 60px, var(--star-glow), transparent);
+            background-size: 150px 80px;
+            opacity: 0.2;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-section h4 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--star-glow);
+        }
+
+        .footer-section a {
+            color: var(--text-secondary-dark);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-glow);
+            text-shadow: 0 0 5px rgba(167, 139, 250, 0.3);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            color: var(--text-secondary-dark);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .authors-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav-links {
+                position: absolute;
+                left: 0;
+                top: 100%;
+                background: rgba(1, 1, 12, 0.95);
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                padding: 1rem 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease-out;
+            }
+            
+            .nav-links.active {
+                max-height: 500px; /* Adjust as needed */
+            }
+
+            .nav-links li {
+                padding: 0.5rem 0;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .methodology-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .authors-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .author-card {
+                padding: 0.75rem;
+            }
+
+            .author-name {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .authors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Image styles */
+        .poster-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .poster-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+        }
+
+        .visual-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.8), rgba(30, 30, 60, 0.8));
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .highlight-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 20px 20px, var(--star-glow), transparent);
+            background-size: 40px 40px;
+            opacity: 0.1;
+        }
+
+        .highlight-box h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-glow);
+            position: relative;
+            z-index: 2;
+        }
+
+        .highlight-box > * {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container nav">
+            <a href="#" class="logo">4M Lunar</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#methodology">Methodology</a></li>
+                    <li><a href="#results">Results</a></li>
+                    <li><a href="#authors">Authors</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1 class="main-title">A Foundational Multimodal Model for Lunar Surface Correlation Discovery: Uncovering Hydration and Beyond</h1>
+            <p class="hero-subtitle">A Foundational Model for Lunar Science</p>
+            <p class="conference-badge">CVPR 2025</p>
+            <p class="hero-description">
+                Our work, developed at NASA's Frontier Development Lab, introduces a pioneering self-supervised, massively multimodal masked model (4M). It analyzes multimodal lunar data from the Moon Mineralogy Mapper (M³) to uncover complex correlations between surface hydration, mineralogy, and morphology, paving the way for future lunar resource utilization.
+            </p>
+            <div class="cta-buttons">
+                <a href="#introduction" class="btn btn-primary">Explore Discoveries</a>
+                <a href="https://www.calameo.com/read/0048123631c6192e49cd1" class="btn btn-secondary" target="_blank">View Paper</a>
+                <a href="FDL Lunar Poster_FF.pdf" class="btn btn-secondary" download>Download Poster</a>
+            </div>
+            
+            <!-- Authors Section -->
+            <div id="authors" class="authors-section">
+                <div class="authors-grid">
+                    <div class="author-card">
+                        <div class="author-name">
+                            <a href="https://www.linkedin.com/in/tejas-panambur" target="_blank">Tejas Panambur</a>
+                        </div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">
+                            <a href="https://www.linkedin.com/in/mario-parente-14462717" target="_blank">Mario Parente</a>
+                        </div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">Kay Wohlfarth</div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">Melissa Martinot</div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">
+                            <a href="https://www.linkedin.com/in/tom-sander-05a6b8115" target="_blank">Tom Sander</a>
+                        </div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">
+                            <a href="https://www.linkedin.com/in/simone-zorzan-b5280b227" target="_blank">Simone Zorzan</a>
+                        </div>
+                    </div>
+                    <div class="author-card">
+                        <div class="author-name">
+                            <a href="https://www.linkedin.com/in/janice-bishop-2a5b5528" target="_blank">Janice L. Bishop</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Overview -->
+    <section id="introduction" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Cracking the Moon's Daily OH/H₂O Cycle</h2>
+            <p class="section-subtitle">
+                Why Lunar Hydration Matters for the Future of Space Exploration
+            </p>
+
+            <div class="methodology-content" style="margin-bottom: 3rem;">
+                <div class="methodology-visual">
+                    <img src="images/lunar_hydration_cycle.png" alt="Lunar Hydration Daily Cycle" class="poster-image" style="width: 100%; max-width: 600px;">
+                </div>
+                <div class="methodology-text">
+                    <h3>🌙 The Mystery of Lunar Water</h3>
+                    <p>Since 2009, M³ has revealed that the Moon hosts a complex OH/H₂O cycle, despite its airless, arid regolith. The 2.7–3 μm absorption band is a direct proxy for hydroxyl (OH) and water (H₂O) on lunar soils.</p>
+                    
+                    <p><strong>The Daily Pattern:</strong> That band is deep at sunrise, diminishes at midday, then deepens again in the afternoon. The amplitude and constant component vary with location.</p>
+                    
+                    <p><strong>Why it matters:</strong> Pinpointing these drivers is critical for future in-situ resource utilization (ISRU) and for interpreting upcoming data from Lunar Trailblazer.</p>
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 4rem;">Initial Insights from M³ Data</h2>
+            <p class="section-subtitle" style="margin-bottom: 2rem;">"Where Minerals Meet Water: Early Correlation Discovery"</p>
+            
+            <div class="methodology-content" style="margin-bottom: 3rem;">
+                <div class="methodology-text">
+                    <p>During the initial phases of data collection and analysis, we identified interesting relationships between mineralogical data and hydration signatures.</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Key Correlations Discovered:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Morning Hydration ↔ Pyroxene:</strong> Regions rich in pyroxene have a higher hydration signature, especially during the early morning hours</li>
+                            <li><strong>Titanium ↔ Midday Dehydration:</strong> Regions with high titanium abundance have a lower hydration signature during midday</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="methodology-visual">
+                    <img src="images/m3_correlations.png" alt="M³ Data Correlations" class="poster-image" style="width: 100%; max-width: 600px;">
+                </div>
+            </div>
+
+            <div class="research-grid">
+                <div class="research-card">
+                    <h3>🔬 The Challenge</h3>
+                    <p>Manual analysis of large planetary datasets becomes laborious, and the human eye might even overlook some relationships. We needed an automated approach to discover complex, non-linear correlations.</p>
+                </div>
+
+                <div class="research-card">
+                    <h3>🤖 Our Solution</h3>
+                    <p>We developed the first lunar foundation model using the Massively Multimodal Masked Model (4M) framework - a transformer-based approach that seamlessly integrates multimodal lunar data.</p>
+                </div>
+
+                <div class="research-card">
+                    <h3>🎯 What We've Achieved</h3>
+                    <p>Built a Lunar Foundation Model validating key hydration links: Strong Pyroxene ↔ IBD₃μm correlation confirmed, and weaker but notable Olivine ↔ IBD₃μm relationship observed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology -->
+    <section id="methodology" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Our Lunar Multimodal ML Pipeline</h2>
+            <p class="section-subtitle">
+                "From Pixels to Predictions: The ABCs of Multimodal Training"
+            </p>
+
+            <div class="visual-grid" style="margin-bottom: 3rem;">
+                <img src="images/multimodal_pipeline.png" alt="Multimodal ML Pipeline Overview" class="poster-image">
+            </div>
+
+            <div class="methodology-content">
+                <div class="methodology-text">
+                    <h3>🚀 The Revolutionary A-B-C Approach</h3>
+                    <p>We developed a novel three-stage pipeline that transforms diverse lunar datasets into unified multimodal representations:</p>
+                    
+                    <ol class="methodology-steps">
+                        <li><strong>A - Abstraction: Tokenize Lunar Modalities</strong><br>
+                        Each data source (spectral, mineralogical, elemental, topographic) is equipped with its own fully trained tokenizer. Every 128×128 patch is run through its modality's VQ encoder to generate discrete token IDs from unique codebooks.</li>
+                        <li><strong>B - Bridging: Masked Autoencoder Learns Cross-Modal Representations</strong><br>
+                        Once the tokenizers are trained, we train a transformer encoder-decoder to learn cross-modal relationships. Training uses a Dirichlet distribution to randomly select input tokens from different modalities.</li>
+                        <li><strong>C - Causal Correlation Discovery</strong><br>
+                        The trained multimodal transformer can predict any modality from any other modality, enabling us to discover which modalities drive hydration signatures across the lunar surface.</li>
+                    </ol>
+                </div>
+
+                <div class="methodology-visual">
+                    <h3>🔬 Technical Innovation</h3>
+                    <div style="background: rgba(1, 1, 12, 0.5); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 0.5rem;">
+                        <p><strong>Tokenization Architecture:</strong> Novel spatial and spectral encoding specifically tailored to hyperspectral data, capturing both spatial structure and spectral signatures across 85+ channels.</p>
+                        
+                        <p><strong>Masking Strategy:</strong> Uses Dirichlet distribution to encourage cross-modal learning rather than simple within-modality reconstruction.</p>
+                        
+                        <p><strong>Foundation Model:</strong> First application of the 4M framework to planetary hyperspectral data, enabling unified analysis of diverse lunar datasets.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tokenizer Architecture Detail -->
+            <div style="background: transparent; padding: 3rem 0; margin-top: 3rem;">
+                <h3 class="section-title" style="font-size: 2rem;">Tokenizer Architecture Deep Dive</h3>
+                <div class="methodology-content">
+                    <div class="methodology-visual">
+                        <img src="images/tokenizer_architecture.png" alt="Tokenizer Architecture" class="poster-image" style="width: 100%; max-width: 600px;">
+                        <p style="text-align: center; font-size: 0.9rem; color: var(--text-secondary-dark); margin-top: 1rem;">
+                            Image tokenizer architecture based on <a href="https://arxiv.org/abs/2206.00386" target="_blank" style="color: var(--accent-glow);">DiVAE (Shi et al., 2022)</a>.
+                        </p>
+                    </div>
+                    <div class="methodology-text">
+                        <h4>🧠 A Multi-Modal Tokenization Strategy</h4>
+                        <p>Our novel approach leverages a suite of specialized tokenizers to handle the unique challenges of diverse lunar data. We process each modality—from complex hyperspectral cubes to simple text—with a dedicated tokenizer before fusing them into a unified model.</p>
+                        
+                        <div style="background: rgba(1, 1, 12, 0.5); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 0.5rem; margin: 1rem 0;">
+                            <p><strong>Hyperspectral Tokenizer:</strong> Captures both spatial features (patches of the lunar surface) and spectral signatures (data across different wavelengths) from 3D data cubes.</p>
+                            <p><strong>Image Tokenizer:</strong> Efficiently encodes standard 2D images, such as mineral maps, into compact representations using a DiVAE-based architecture.</p>
+                            <p><strong>Text Tokenizer:</strong> Converts tabular data, such as latitude, longitude, and time of day, into meaningful embeddings for the model.</p>
+                        </div>
+                        
+                        <p>This multi-pronged tokenization ensures that every piece of information, regardless of its original format, is processed effectively before being integrated into the main model.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inference Pipeline -->
+            <div style="background: transparent; padding: 3rem 0;">
+                <h3 class="section-title" style="font-size: 2rem;">Causal Correlation Discovery</h3>
+                <p class="section-subtitle">"Testing Which Modalities Drive Hydration & Mineral Relationships"</p>
+                
+                <div class="visual-grid" style="margin: 2rem 0;">
+                    <img src="images/inference_pipeline.png" alt="Inference Pipeline" class="poster-image">
+                </div>
+                
+                <div class="methodology-content">
+                    <div class="methodology-text">
+                        <h4>🔍 Cross-Modal Inference Process</h4>
+                        <p>For this work, all experiments and validation were conducted solely among three modalities: <strong>Pyroxene, Olivine, and Morning IBD₃μm (hydration)</strong>.</p>
+                        
+                        <p>Our inference pipeline enables us to:</p>
+                        <ul style="margin-left: 1.5rem;">
+                            <li><strong>Sanity Check:</strong> Confirm the model can reconstruct one modality accurately before testing causal links</li>
+                            <li><strong>Within-Modality Fidelity:</strong> Test reconstruction quality - tokenizer-only vs multimodal fusion</li>
+                            <li><strong>Cross-Modal Inference:</strong> Discover which modalities correlate with hydration patterns</li>
+                        </ul>
+                    </div>
+                    <div class="methodology-visual">
+                        <div style="background: rgba(1, 1, 12, 0.5); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 0.5rem;">
+                            <h4>Key Validation Results:</h4>
+                            <p><strong>Tokenizer-Only:</strong> Rebuilds pyroxene maps with minimal blur and fine textures</p>
+                            <p><strong>Multimodal Fusion:</strong> Introduces extra smoothing around edges but retains overall footprint</p>
+                            <p><strong>Takeaway:</strong> Cross-modal errors in bridging phase reflect causal complexity, not broken autoencoder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Groundbreaking Results</h2>
+            <p class="section-subtitle">
+                Validating core mineral-hydration correlations and pushing the boundaries of model performance.
+            </p>
+
+            <!-- Main Findings -->
+            <div class="methodology-content" style="margin-bottom: 4rem;">
+                <div class="methodology-visual">
+                    <img src="images/cross_modal_inference.png" alt="Cross-Modal Inference Results" class="poster-image">
+                </div>
+                <div class="methodology-text">
+                    <h3>🔍 Validated Core Modal Correlations</h3>
+                    <p>Our model successfully confirmed and quantified the relationship between key minerals and lunar hydration signatures, revealing critical causal links.</p>
+                    <div class="highlight-box" style="margin: 1rem 0;">
+                        <h4>🟢 Pyroxene ↔ IBD₃μm (Hydration)</h4>
+                        <p><strong>Strong, Qualitatively Significant Link Confirmed:</strong> Our findings show that pyroxene abundance is the strongest causal predictor of morning hydration signatures. This suggests pyroxene-rich regions are key targets for future water resource exploration.</p>
+                    </div>
+                    <div class="highlight-box" style="margin: 1rem 0;">
+                        <h4>🟡 Olivine ↔ IBD₃μm (Hydration)</h4>
+                        <p><strong>Weaker but Notable Relationship Observed:</strong> Olivine shows a measurable, though less predictive, correlation with hydration, adding another layer of understanding to the lunar water cycle.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reconstruction & Implications -->
+            <div class="methodology-content">
+                 <div class="methodology-text">
+                    <h3>🎯 Reconstruction Quality & Fidelity</h3>
+                    <p>Before testing causal links, we validated our model's ability to reconstruct what it sees. The high fidelity of our diffusion tokenizer ensures that any cross-modal inference errors reflect true causal complexity, not a broken autoencoder.</p>
+                     <div class="highlight-box" style="margin: 1rem 0;">
+                         <p><strong>Tokenizer-Only Performance:</strong> Rebuilds mineral maps with minimal blur and preserves fine textures.</p>
+                         <p><strong>Key Insight:</strong> This high-fidelity reconstruction provides a reliable baseline for discovering genuine mineral-water relationships.</p>
+                     </div>
+                </div>
+                <div class="methodology-visual">
+                    <img src="images/reconstruction_results.png" alt="Reconstruction Quality Results" class="poster-image">
+                </div>
+            </div>
+
+            <!-- Scientific Implications -->
+            <div style="margin-top: 4rem; text-align: center;">
+                <div class="highlight-box">
+                    <h3>🧪 Scientific Implications</h3>
+                    <p style="margin: 1rem auto; max-width: 800px;">These findings suggest that <strong>pyroxene-rich regions</strong> on the Moon are prime locations for retaining water/hydroxyl signatures. This could be due to unique thermal properties, surface roughness affecting solar wind implantation, or mineralogical composition influencing water formation. This work provides a critical roadmap for future ISRU missions and instruments like the Lunar Trailblazer.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Visual Results -->
+    <section class="visual-section content-section">
+        <div class="container">
+            <h2 class="section-title">Research Poster</h2>
+            <p class="section-subtitle">Comprehensive visual summary of our methodology and findings</p>
+            
+            <div class="visual-grid">
+                <img src="poster_page-1.png" alt="FDL Lunar Research Poster" class="poster-image">
+            </div>
+        </div>
+    </section>
+
+    <!-- Publications -->
+    <section id="publications" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Publications & Recognition</h2>
+            
+            <div class="publication-card">
+                <div class="publication-title">Determining the Cause of Diurnal Changes in Lunar Volatiles Using Machine Learning</div>
+                <div class="publication-authors">Kay Wohlfarth, Mélissa Martinot, Tom Sander, <strong>Tejas Panambur</strong>, Simone Zorzan</div>
+                <div class="publication-venue">Frontier Development Lab Technical Memorandum, August 2024</div>
+            </div>
+
+            <div class="publication-card">
+                <div class="publication-title">A Foundational Multimodal Model for Lunar Surface Correlation Discovery: Uncovering Hydration and Beyond</div>
+                <div class="publication-authors"><strong>Tejas Panambur</strong>, Mario Parente, Kay Wohlfarth, Melissa Martinot, Tom Sander, Simone Zorzan, Janice L. Bishop</div>
+                <div class="publication-venue">Conference Poster Presentation</div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🏆 Program Recognition</h3>
+                <p>This work was enabled by the Frontier Development Lab (FDL) - a partnership between NASA, SETI Institute, and leading technology companies including Google Cloud, NVIDIA, and Lockheed Martin. FDL brings together early-career researchers to tackle humanity's most critical space science challenges using cutting-edge AI/ML techniques.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Tejas Panambur</p>
+                    <p>Remote Hyperspectral Observer</p>
+                    <p>University of Massachusetts, Amherst</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Research Interests</h4>
+                    <a href="#">Hyperspectral Remote Sensing</a>
+                    <a href="#">Multimodal Machine Learning</a>
+                    <a href="#">Planetary Science</a>
+                    <a href="#">Computer Vision</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Collaborations</h4>
+                    <a href="#">NASA Ames Research Center</a>
+                    <a href="#">SETI Institute</a>
+                    <a href="#">Frontier Development Lab</a>
+                    <a href="#">University of Massachusetts</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Tejas Panambur. This work was supported by NASA under Cooperative Agreement No. NNX14AT27A through the Frontier Development Lab.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for smooth scrolling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.header');
+            const navLinksContainer = document.querySelector('.nav-links');
+            const hamburger = document.querySelector('.hamburger');
+
+            // --- Smooth scrolling with header offset ---
+            const smoothScroll = (targetId) => {
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const headerHeight = header ? header.offsetHeight : 0;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            };
+
+            // Attach smooth scroll to all anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    smoothScroll(targetId);
+
+                    // Close hamburger menu on link click
+                    if (navLinksContainer.classList.contains('active')) {
+                        navLinksContainer.classList.remove('active');
+                    }
+                });
+            });
+
+            // --- Intersection Observer for animations ---
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        obs.unobserve(entry.target); // Stop observing after animation
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards and sections
+            document.querySelectorAll('.research-card, .result-card, .publication-card, .methodology-content > div, .highlight-box').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(el);
+            });
+
+            // --- Hamburger menu toggle ---
+            if (hamburger && navLinksContainer) {
+                hamburger.addEventListener('click', () => {
+                    navLinksContainer.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
