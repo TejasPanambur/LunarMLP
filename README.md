@@ -1,4 +1,4 @@
-# Tejas Panambur - CVPR 2025 Landing Page
+# Foundational Multimodal Model - CVPR 2025 Landing Page
 
 ## A Foundational Multimodal Model for Lunar Surface Correlation Discovery
 
